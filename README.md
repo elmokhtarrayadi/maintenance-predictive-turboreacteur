@@ -1,6 +1,6 @@
 <div align="center">
 
-# Maintenance prédictive d’un turboréacteur CFM56-7B
+# Maintenance prédictive d’un turboréacteur
 
 **Analyse des défaillances · AMDEC · Fiabilité · Prédiction de la durée de vie résiduelle (RUL)**
 
