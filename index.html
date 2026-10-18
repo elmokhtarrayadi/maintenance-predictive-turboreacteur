@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Maintenance prédictive d’un turboréacteur CFM56-7B — Elmokhtar Rayadi</title>
+  <meta name="description" content="Analyse des défaillances (Pareto, AMDEC) et modèle XGBoost de prédiction de la durée de vie résiduelle (RUL) d’un turboréacteur CFM56-7B.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Maintenance prédictive d’un turboréacteur CFM56-7B — Elmokhtar Rayadi">
+  <meta property="og:description" content="Pareto · AMDEC · fiabilité · XGBoost : R² = 0,87 et 9 à 19 vols d’anticipation avant la panne.">
+  <meta property="og:url" content="https://elmokhtarrayadi.github.io/maintenance-predictive-turboreacteur/">
+  <meta property="og:image" content="https://elmokhtarrayadi.github.io/maintenance-predictive-turboreacteur/assets/rul-historique.webp">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar" aria-label="Navigation">
+    <div class="identity">
+      <div class="identity-mark">E<span>R</span></div>
+      <div><strong>ELMOKHTAR RAYADI</strong><small>Portfolio d’ingénierie mécanique</small></div>
+    </div>
+    <div class="side-project">
+      <span>ÉTUDE DE CAS</span>
+      <h2>Maintenance prédictive d’un turboréacteur</h2>
+      <p>Pareto · AMDEC · Fiabilité · XGBoost</p>
+    </div>
+    <nav class="side-nav">
+      <a href="#synthese" class="active"><b>01</b>Synthèse</a>
+      <a href="#defaillances"><b>02</b>Analyse des défaillances</a>
+      <a href="#amdec"><b>03</b>Calcul de criticité AMDEC</a>
+      <a href="#surveillance"><b>04</b>Seuils de surveillance</a>
+      <a href="#modele"><b>05</b>Modèle prédictif</a>
+      <a href="#galerie"><b>06</b>Graphiques</a>
+    </nav>
+    <div class="side-foot"><a href="https://github.com/elmokhtarrayadi">← Tous mes projets</a></div>
+  </aside>
+
+  <main>
+    <section id="synthese" class="hero">
+      <div class="hero-text">
+        <span class="eyebrow">PROJET DE FIN D’ANNÉE · MAINTENANCE ET FIABILITÉ</span>
+        <h1>Anticiper la panne d’un <em>turboréacteur</em> avant qu’elle n’arrive</h1>
+        <p class="lead">Les déposes non programmées de moteur coûtent cher et immobilisent les avions. À partir des rapports d’atelier d’une flotte de CFM56-7B, j’ai identifié le module le plus critique (Pareto, AMDEC), puis développé un modèle XGBoost qui estime la durée de vie résiduelle (RUL) à partir de la marge EGT et des vibrations du cœur moteur.</p>
+        <div class="tags"><span>AMDEC</span><span>Pareto</span><span>Fiabilité</span><span>Python</span><span>XGBoost</span><span>Excel</span></div>
+      </div>
+      <figure class="hero-img"><img src="assets/rul-historique.webp" alt="RUL réel et RUL prédit par le modèle sur 260 vols"><figcaption>RUL réel et prédit sur 260 vols · zones normale, alerte et critique</figcaption></figure>
+    </section>
+
+    <div class="kpis">
+      <div class="kpi"><small>Moteurs analysés</small><strong>29</strong><span>22 déposes non programmées</span></div>
+      <div class="kpi accent"><small>Précision du modèle</small><strong>0,87<i>R²</i></strong><span>Erreur moyenne : 9,7 vols</span></div>
+      <div class="kpi accent"><small>Anticipation</small><strong>9–19<i>vols</i></strong><span>avant la panne réelle</span></div>
+      <div class="kpi"><small>Gain vs régression linéaire</small><strong>−27<i>%</i></strong><span>d’erreur moyenne (MAE)</span></div>
+    </div>
+
+    <section class="card">
+      <div class="card-head"><span>DÉMARCHE</span><h2>Des rapports d’atelier à la décision de maintenance</h2></div>
+      <ol class="steps">
+        <li><b>Données</b>Rapports d’atelier filtrés et base Excel structurée : TSN/CSN, motifs de dépose, déposes programmées exclues.</li>
+        <li><b>Pareto</b>7 causes représentent ≈ 80 % des défaillances, dont 6 dans le module MM02 (cœur moteur).</li>
+        <li><b>AMDEC</b>Criticité G × O × D sur 6 niveaux, complétée par une priorité technico-économique.</li>
+        <li><b>Prédiction</b>XGBoost (200 arbres) sur 260 vols : marge EGT, vibrations N2, CSN → RUL et décision.</li>
+      </ol>
+    </section>
+
+    <section id="defaillances" class="card">
+      <div class="card-head"><span>02 · RÉSULTATS</span><h2>Quelles défaillances pèsent le plus ?</h2>
+        <p>Les défaillances non programmées ont été classées par fréquence. Le cœur moteur (MM02 : compresseur HP, chambre de combustion, turbine HP) concentre presque toutes les causes critiques.</p></div>
+      <div class="two">
+        <figure><img src="assets/pareto-defaillances.webp" alt="Diagramme de Pareto des défaillances"><figcaption>Diagramme de Pareto des causes de dépose</figcaption></figure>
+        <div>
+          <h3 style="margin:0 0 4px;font-size:15px;color:var(--deep)">Les 7 causes critiques (≈ 80 %)</h3>
+          <div class="crit-list" id="critList"></div>
+          <p class="note">Après pondération par la gravité, la détectabilité et le coût, l’AMDEC retient comme plus critiques : <b>aubes de turbine HP</b>, <b>ingestion de corps étrangers</b>, <b>chambre de combustion</b> et <b>fissures du compresseur HP</b>, toutes dans le module MM02, qui devient la cible de la surveillance prédictive.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="amdec" class="card">
+      <div class="card-head"><span>03 · INTERACTIF</span><h2>Calcul de criticité AMDEC</h2>
+        <p>Grilles de cotation construites pour l’étude avec les équipes méthodes et maintenance, sur 6 niveaux. Réglez les trois indices pour voir la criticité et la catégorie de risque.</p></div>
+      <div class="amdec">
+        <div>
+                    <div class="idx"><label>Gravité G <output id="oG"></output></label><input type="range" id="G" min="1" max="6" value="5"><p id="dG"></p></div>
+          <div class="idx"><label>Occurrence O <output id="oO"></output></label><input type="range" id="O" min="1" max="6" value="4"><p id="dO"></p></div>
+          <div class="idx"><label>Détectabilité D <output id="oD"></output></label><input type="range" id="D" min="1" max="6" value="5"><p id="dD"></p></div>
+        </div>
+        <div class="verdict">
+          <div><small>Criticité C = G × O × D</small><strong id="rC">–</strong></div>
+          <div><small>Catégorie</small><span id="rCat" class="pill"></span></div>
+          <div><small>Lecture</small><span id="rTxt" style="font-size:13px;color:#d9eef0"></span></div>
+        </div>
+      </div>
+      <p class="note">Dans l’étude, la criticité est ensuite multipliée par le coût total de la défaillance (réparation et immobilisation) pour obtenir une priorité technico-économique.</p>
+    </section>
+
+    <section id="surveillance" class="card">
+      <div class="card-head"><span>04 · INTERACTIF</span><h2>Seuils de surveillance du moteur</h2>
+        <p>Les deux indicateurs retenus et les seuils utilisés pour construire le RUL. Faites varier les mesures pour voir la décision qui en découle.</p></div>
+      <div class="mon">
+        <div>
+          <div class="idx"><label>Marge EGT (°C) <output id="oE"></output></label><input type="range" id="E" min="5" max="35" step="0.5" value="22"><p>Marge = EGT limite − EGT mesurée. Plus elle baisse, plus le moteur est dégradé.</p></div>
+          <div class="idx"><label>Vibrations N2 du cœur moteur <output id="oV"></output></label><input type="range" id="V" min="0.01" max="0.12" step="0.001" value="0.05"><p>Vibrations du rotor haute pression, précurseur d’usure et de déséquilibre.</p></div>
+          <div class="decision" id="dec"></div>
+        </div>
+        <div>
+          <div class="gauge"><h3>Marge EGT <span id="gE"></span></h3><div class="track" id="tE"></div><div class="scale"><span>5 °C</span><span>critique &lt; 10</span><span>alerte &lt; 15</span><span>35 °C</span></div></div>
+          <div class="gauge"><h3>Vibrations N2 <span id="gV"></span></h3><div class="track" id="tV"></div><div class="scale"><span>0,01</span><span>alerte &gt; 0,080</span><span>critique &gt; 0,095</span><span>0,12</span></div></div>
+          <p class="note">Dans l’historique étudié, le seuil critique de vibration est franchi au vol 119 (0,1008 &gt; 0,095), qui fixe la panne de référence : le RUL maximal est donc de 118 vols. Le modèle bascule ensuite en « Planifier » sous 20 vols de RUL et en « Intervenir » sous 10 vols.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="modele" class="card">
+      <div class="card-head"><span>05 · RÉSULTATS</span><h2>Modèle prédictif : XGBoost contre régression linéaire</h2>
+        <p>Données découpées en 80 % d’entraînement et 20 % de test. La régression linéaire sert de référence.</p></div>
+      <div class="two">
+        <div>
+          <table class="metrics-tbl">
+            <thead><tr><th>Modèle</th><th>MAE</th><th>RMSE</th><th>R²</th></tr></thead>
+            <tbody>
+              <tr class="best"><td>XGBoost (200 arbres)</td><td>9,67 vols</td><td>12,89 vols</td><td>0,872</td></tr>
+              <tr><td>Régression linéaire</td><td>13,19 vols</td><td>14,90 vols</td><td>0,829</td></tr>
+              <tr><td>Gain XGBoost</td><td>−26,7 %</td><td>−13,5 %</td><td>+4,3 pts</td></tr>
+            </tbody>
+          </table>
+          <p class="note">Le modèle suit la décroissance réelle du RUL, entre en zone d’alerte vers le vol 100 et en zone critique vers le vol 110, soit <b>9 à 19 vols d’anticipation</b> avant la panne. Sur une simulation des 40 vols suivants, il recommande de planifier une visite atelier dès le vol 294, sans jamais atteindre la zone critique.</p>
+        </div>
+        <figure><img src="assets/xgboost-vs-regression.webp" alt="Comparaison des métriques XGBoost et régression linéaire"><figcaption>MAE, RMSE et R² des deux modèles</figcaption></figure>
+      </div>
+      <div class="two" style="margin-top:18px">
+        <figure><img src="assets/xgboost-reel-vs-predit.webp" alt="RUL réel contre RUL prédit sur le jeu de test"><figcaption>Jeu de test : RUL réel contre RUL prédit</figcaption></figure>
+        <figure><img src="assets/rul-prevision-40-vols.webp" alt="Prévision du RUL sur les 40 prochains vols"><figcaption>Prévision du RUL sur les 40 vols suivants</figcaption></figure>
+      </div>
+    </section>
+
+    <section id="galerie" class="card">
+      <div class="card-head"><span>06 · GRAPHIQUES</span><h2>Analyse et résultats</h2></div>
+      <div class="gallery" id="gallery"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><span>SUITE</span><h2>Perspectives</h2></div>
+      <ul class="plain">
+        <li>Entraîner le modèle sur plusieurs moteurs et plusieurs pannes pour qu’il généralise au-delà d’un historique.</li>
+        <li>Ajouter d’autres paramètres de surveillance : analyse d’huile, débit carburant, vitesses N1/N2.</li>
+        <li>Intégrer les prédictions dans un tableau de bord de planification des visites atelier.</li>
+      </ul>
+      <p class="ref">Données d’exploitation d’une compagnie aérienne, anonymisées. Seuls la méthode et les résultats agrégés sont présentés.</p>
+    </section>
+
+    <footer>Elmokhtar Rayadi · Élève ingénieur en Génie Mécanique des Systèmes Industriels · <a href="https://github.com/elmokhtarrayadi/maintenance-predictive-turboreacteur">Dépôt GitHub</a></footer>
+  </main>
+</div>
+
+<div class="lightbox" id="lightbox" hidden><button aria-label="Fermer">×</button><img alt=""><p></p></div>
+<script src="app.js"></script>
+</body>
+</html>
